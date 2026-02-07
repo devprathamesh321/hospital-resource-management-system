@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Admin Dashboard | MedFlow</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+    --sidebar-width:260px;
+    --primary:#2563eb;
+    --bg:#f1f5f9;
+}
+
+body{
+    margin:0;
+    font-family:'Inter',sans-serif;
+    background:var(--bg);
+    display:flex;
+}
+
+/* SIDEBAR */
+.sidebar{
+    width:var(--sidebar-width);
+    background:#0f172a;
+    height:100vh;
+    color:white;
+    position:fixed;
+    padding:20px;
+}
+
+.sidebar-brand{
+    font-size:22px;
+    font-weight:700;
+    color:#3b82f6;
+    margin-bottom:40px;
+}
+
+.nav-link{
+    display:block;
+    padding:12px 16px;
+    border-radius:8px;
+    color:#94a3b8;
+    text-decoration:none;
+    margin-bottom:8px;
+}
+
+.nav-link:hover,
+.nav-link.active{
+    background:#1e293b;
+    color:white;
+}
+
+/* MAIN */
+.main{
+    margin-left:var(--sidebar-width);
+    padding:40px;
+    flex-grow:1;
+}
+
+/* STATS */
+.stats{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:20px;
+    margin-bottom:40px;
+}
+
+.card{
+    background:white;
+    padding:24px;
+    border-radius:12px;
+}
+
+/* ACTIONS */
+.actions{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:20px;
+}
+
+.action-card{
+    background:white;
+    padding:25px;
+    border-radius:12px;
+    display:flex;
+    align-items:center;
+    gap:20px;
+    text-decoration:none;
+    color:black;
+    transition:.2s;
+}
+
+.action-card:hover{
+    transform:translateY(-3px);
+    border:1px solid var(--primary);
+}
+
+.icon{
+    width:50px;
+    height:50px;
+    background:#eff6ff;
+    border-radius:10px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:22px;
+}
+
+/* ACTIVITY TIMELINE */
+.timeline{
+    background:white;
+    padding:25px;
+    border-radius:12px;
+    max-width:900px;
+}
+
+.timeline-item{
+    display:flex;
+    gap:15px;
+    margin-bottom:18px;
+}
+
+.dot{
+    width:10px;
+    height:10px;
+    border-radius:50%;
+    margin-top:6px;
+}
+
+.info{ background:#22c55e; }
+.warn{ background:#f59e0b; }
+.crit{ background:#ef4444; }
+</style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+    <div class="sidebar-brand">⚕️ MedFlow</div>
+
+    <a href="/admin/dashboard" class="nav-link active">📊 Overview</a>
+    <a href="/admin/beds" class="nav-link">🛏️ Bed Management</a>
+    <a href="/admin/doctors" class="nav-link">👨‍⚕️ Doctor Management</a>
+    <a href="/emergency" class="nav-link">🚨 Emergency</a>
+    <a href="/admin/reports" class="nav-link">📈 Reports</a>
+
+    <a href="/" class="nav-link" style="color:#f87171;">🚪 Logout</a>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+    <h1>Hospital Command Center</h1>
+    <p style="color:#64748b;">Real-time system overview</p>
+
+    <!-- STATS -->
+    <div class="stats">
+        <div class="card">
+            <strong>Bed Occupancy</strong>
+            <h2 th:text="${bedOccupancy}">82 / 120</h2>
+        </div>
+        <div class="card">
+            <strong>Doctors On Duty</strong>
+            <h2 th:text="${doctorsOnDuty}">25</h2>
+        </div>
+        <div class="card">
+            <strong>Active Emergencies</strong>
+            <h2 style="color:#ef4444" th:text="${activeEmergencies}">7</h2>
+        </div>
+        <div class="card">
+            <strong>Waiting Patients</strong>
+            <h2 th:text="${waitingPatients}">14</h2>
+        </div>
+    </div>
+
+    <!-- OPERATIONS -->
+    <h2>Operations</h2>
+    <div class="actions">
+        <a href="/admin/beds" class="action-card">
+            <div class="icon">🛏️</div>
+            <div>
+                <h3>Ward Management</h3>
+                <p>Allocate and monitor beds</p>
+            </div>
+        </a>
+
+        <a href="/admin/doctors" class="action-card">
+            <div class="icon">👨‍⚕️</div>
+            <div>
+                <h3>Doctor Roster</h3>
+                <p>Manage duty schedules</p>
+            </div>
+        </a>
+
+        <a href="/emergency" class="action-card">
+            <div class="icon">🚑</div>
+            <div>
+                <h3>Emergency Monitor</h3>
+                <p>Live emergency tracking</p>
+            </div>
+        </a>
+    </div>
+
+    <!-- ACTIVITY TIMELINE -->
+    <h2 style="margin-top:50px;">Recent Activity</h2>
+
+    <div class="timeline">
+        <div th:if="${#lists.isEmpty(activities)}" style="color:#64748b">
+            No recent system activity
+        </div>
+
+        <div th:each="a : ${activities}" class="timeline-item">
+            <div class="dot"
+                 th:classappend="${a.level=='CRITICAL'?'crit':a.level=='WARNING'?'warn':'info'}"></div>
+
+            <div>
+                <strong th:text="${a.title}">Activity</strong>
+                <div th:text="${a.message}" style="color:#64748b"></div>
+                <small th:text="${#temporals.format(a.createdAt,'dd MMM yyyy HH:mm')}"
+                       style="color:#94a3b8"></small>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+</body>
+</html>

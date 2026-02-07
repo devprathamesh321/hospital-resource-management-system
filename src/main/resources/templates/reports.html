@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Reports & Analytics | MedFlow</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+:root{
+    --primary:#2563eb;
+    --success:#10b981;
+    --warning:#f59e0b;
+    --danger:#ef4444;
+    --sidebar:#0f172a;
+    --bg:#f1f5f9;
+    --muted:#64748b;
+}
+
+*{ box-sizing:border-box; }
+
+body{
+    margin:0;
+    font-family:'Inter',sans-serif;
+    background:var(--bg);
+    display:flex;
+}
+
+/* SIDEBAR */
+.sidebar{
+    width:260px;
+    background:var(--sidebar);
+    min-height:100vh;
+    padding:25px;
+    color:white;
+    position:fixed;
+    left:0;
+    top:0;
+}
+
+.sidebar h2{
+    color:#3b82f6;
+    margin-bottom:40px;
+}
+
+.sidebar a{
+    display:block;
+    padding:12px 15px;
+    margin-bottom:8px;
+    border-radius:8px;
+    color:#cbd5e1;
+    text-decoration:none;
+}
+
+.sidebar a.active,
+.sidebar a:hover{
+    background:#1e293b;
+    color:white;
+}
+
+/* MAIN */
+.main{
+    margin-left:260px;   /* 🔥 FIXED */
+    padding:40px 50px;
+    width:calc(100% - 260px);
+}
+
+/* HEADER */
+.header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:35px;
+}
+
+.header h1{
+    margin:0;
+    font-size:30px;
+}
+
+.header p{
+    color:var(--muted);
+}
+
+/* KPI */
+.kpi-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:25px;
+    margin-bottom:40px;
+}
+
+.kpi{
+    background:white;
+    padding:25px;
+    border-radius:18px;
+    border-left:6px solid var(--primary);
+}
+
+.kpi.warning{ border-color:var(--warning); }
+.kpi.danger{ border-color:var(--danger); }
+
+.kpi label{
+    font-size:13px;
+    color:var(--muted);
+    font-weight:600;
+}
+
+.kpi h2{
+    margin:10px 0;
+    font-size:32px;
+}
+
+/* PANELS */
+.panel{
+    background:white;
+    padding:30px;
+    border-radius:20px;
+    margin-bottom:40px;
+}
+
+.panel h3{
+    margin-top:0;
+    margin-bottom:20px;
+}
+
+/* CHART GRID */
+.chart-grid{
+    display:grid;
+    grid-template-columns:2fr 1fr;
+    gap:30px;
+}
+
+canvas{
+    width:100% !important;
+}
+
+/* INSIGHTS */
+.insights{
+    background:#f8fafc;
+    padding:20px;
+    border-radius:14px;
+}
+
+.insights li{
+    margin-bottom:12px;
+    font-size:14px;
+}
+
+/* BUTTON */
+.btn{
+    background:var(--primary);
+    color:white;
+    padding:10px 18px;
+    border-radius:8px;
+    text-decoration:none;
+    font-weight:600;
+    font-size:14px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <h2>⚕️ MedFlow</h2>
+    <a href="/admin/dashboard">📊 Dashboard</a>
+    <a href="/admin/beds">🛏️ Beds</a>
+    <a href="/admin/doctors">👨‍⚕️ Doctors</a>
+    <a href="/emergency">🚨 Emergency</a>
+    <a href="/admin/reports" class="active">📈 Reports</a>
+    <a href="/">🚪 Logout</a>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+    <div class="header">
+        <div>
+            <h1>Reports & Analytics</h1>
+            <p>Hospital operational intelligence dashboard</p>
+        </div>
+        <a href="#" class="btn" onclick="window.print()">📄 Export PDF</a>
+    </div>
+
+    <!-- KPI -->
+    <div class="kpi-grid">
+        <div class="kpi">
+            <label>Patient Throughput</label>
+            <h2>1,284</h2>
+            <span style="color:var(--success)">▲ 12% increase</span>
+        </div>
+
+        <div class="kpi warning">
+            <label>Avg Response Time</label>
+            <h2>4.2 min</h2>
+            <span style="color:var(--warning)">Optimal</span>
+        </div>
+
+        <div class="kpi danger">
+            <label>Critical Emergencies</label>
+            <h2>08</h2>
+            <span style="color:var(--danger)">High Alert</span>
+        </div>
+    </div>
+
+    <!-- CHARTS -->
+    <div class="panel">
+        <h3>Resource Utilization</h3>
+
+        <div class="chart-grid">
+            <canvas id="utilChart"></canvas>
+
+            <div class="insights">
+                <h4>System Insights</h4>
+                <ul>
+                    <li><b>Surge Alert:</b> Emergency cases rising in Ward B</li>
+                    <li><b>Efficiency:</b> Doctor utilization improved by 14%</li>
+                    <li><b>Inventory:</b> Emergency supplies at 30%</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+new Chart(document.getElementById('utilChart'), {
+    type: 'bar',
+    data: {
+        labels: ['Beds', 'Doctors', 'Emergency Load'],
+        datasets: [{
+            label: 'Utilization %',
+            data: [78, 92, 45],
+            backgroundColor: ['#2563eb', '#10b981', '#f59e0b']
+        }]
+    },
+    options: {
+        responsive:true,
+        plugins:{ legend:{ display:false }},
+        scales:{
+            y:{ beginAtZero:true, max:100 }
+        }
+    }
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Doctor Management | MedFlow</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+    --primary:#2563eb;
+    --sidebar:#0f172a;
+    --muted:#64748b;
+    --border:#e2e8f0;
+    --success:#10b981;
+    --bg:#f8fafc;
+}
+
+*{ box-sizing:border-box; }
+
+body{
+    margin:0;
+    font-family:'Inter',sans-serif;
+    background:var(--bg);
+    display:flex;
+}
+
+/* SIDEBAR */
+.sidebar{
+    width:260px;
+    background:var(--sidebar);
+    height:100vh;
+    padding:25px;
+    color:white;
+    position:fixed;
+}
+
+.sidebar h2{
+    color:#3b82f6;
+    margin-bottom:40px;
+}
+
+.sidebar a{
+    display:block;
+    padding:12px 15px;
+    margin-bottom:8px;
+    border-radius:8px;
+    color:#cbd5e1;
+    text-decoration:none;
+}
+
+.sidebar a.active,
+.sidebar a:hover{
+    background:#1e293b;
+    color:white;
+}
+
+/* MAIN */
+.main{
+    margin-left:260px;
+    padding:40px 50px;
+    width:calc(100% - 260px);
+}
+
+/* HEADER */
+.header{
+    margin-bottom:30px;
+}
+.header h1{
+    margin:0;
+    font-size:28px;
+}
+.header p{
+    color:var(--muted);
+}
+
+/* FORM */
+.form-card{
+    background:white;
+    padding:30px;
+    border-radius:18px;
+    border:1px solid var(--border);
+    margin-bottom:40px;
+}
+
+.form-grid{
+    display:grid;
+    grid-template-columns:2fr 2fr 1.5fr 1fr;
+    gap:20px;
+    align-items:end;
+}
+
+label{
+    font-size:13px;
+    font-weight:600;
+    color:#475569;
+}
+
+input,select{
+    width:100%;
+    padding:12px;
+    border-radius:10px;
+    border:1px solid var(--border);
+}
+
+.btn{
+    background:var(--primary);
+    color:white;
+    border:none;
+    padding:12px;
+    border-radius:10px;
+    font-weight:600;
+    cursor:pointer;
+}
+.btn:hover{ background:#1d4ed8; }
+
+/* FILTER BAR */
+.filter-bar{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:15px;
+}
+
+.filter-bar input{
+    max-width:300px;
+}
+
+/* TABLE */
+.table-box{
+    background:white;
+    border-radius:18px;
+    border:1px solid var(--border);
+    overflow:hidden;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th{
+    background:#f1f5f9;
+    padding:18px;
+    font-size:12px;
+    text-transform:uppercase;
+    color:var(--muted);
+}
+
+td{
+    padding:18px;
+    border-bottom:1px solid #f1f5f9;
+}
+
+tr:hover{
+    background:#f8fafc;
+}
+
+/* DOCTOR CELL */
+.doc-info{
+    display:flex;
+    align-items:center;
+    gap:15px;
+}
+
+.avatar{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    background:#e0e7ff;
+    color:var(--primary);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:700;
+}
+
+.doc-sub{
+    font-size:12px;
+    color:var(--muted);
+}
+
+/* STATUS */
+.status{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:6px 14px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:700;
+}
+
+.on{
+    background:#dcfce7;
+    color:#15803d;
+}
+.off{
+    background:#f1f5f9;
+    color:#64748b;
+}
+
+.dot{
+    width:6px;
+    height:6px;
+    border-radius:50%;
+    background:currentColor;
+}
+
+/* TOGGLE */
+.btn-toggle{
+    padding:7px 16px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:700;
+    text-decoration:none;
+    background:var(--primary);
+    color:white;
+}
+</style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <h2>⚕️ MedFlow</h2>
+    <a href="/admin/dashboard">📊 Dashboard</a>
+    <a href="/admin/beds">🛏️ Bed Management</a>
+    <a href="/admin/doctors" class="active">👨‍⚕️ Doctor Management</a>
+    <a href="/emergency">🚑 Emergency</a>
+    <a href="/">🚪 Logout</a>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+    <div class="header">
+        <h1>Doctor Directory</h1>
+        <p>Manage doctor availability and duty status</p>
+    </div>
+
+    <!-- ADD -->
+    <div class="form-card">
+        <h3>Register Doctor</h3>
+        <form class="form-grid" method="post" action="/admin/addDoctor">
+            <div>
+                <label>Name</label>
+                <input type="text" name="name" required>
+            </div>
+            <div>
+                <label>Specialization</label>
+                <select name="specialization">
+                    <option>Cardiology</option>
+                    <option>Neurology</option>
+                    <option>Pediatrics</option>
+                    <option>Emergency</option>
+                    <option>Surgery</option>
+                </select>
+            </div>
+            <div>
+                <label>Initial Status</label>
+                <select name="onDuty">
+                    <option value="true">On Duty</option>
+                    <option value="false">Off Duty</option>
+                </select>
+            </div>
+            <button class="btn">Add Doctor</button>
+        </form>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-box">
+        <table id="doctorTable">
+            <thead>
+                <tr>
+                    <th>Doctor</th>
+                    <th>Specialization</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="d : ${doctors}">
+                    <td>
+                        <div class="doc-info">
+                            <div class="avatar" th:text="${#strings.substring(d.name,0,1)}">D</div>
+                            <div>
+                                <strong th:text="${d.name}">Doctor</strong>
+                                <div class="doc-sub" th:text="'ID: DOC-' + ${d.doctorId}"></div>
+                            </div>
+                        </div>
+                    </td>
+                    <td th:text="${d.specialization}"></td>
+                    <td>
+                        <span class="status" th:classappend="${d.onDuty?'on':'off'}">
+                            <span class="dot"></span>
+                            <span th:text="${d.onDuty?'On Duty':'Off Duty'}"></span>
+                        </span>
+                    </td>
+                    <td>
+                        <a th:href="@{'/admin/toggleDuty/' + ${d.doctorId}}"
+                           class="btn-toggle"
+                           th:text="${d.onDuty?'Set Off Duty':'Set On Duty'}"></a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+</body>
+</html>

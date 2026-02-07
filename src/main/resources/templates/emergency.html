@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Emergency Triage | MedFlow</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+    --critical:#ef4444;
+    --high:#f59e0b;
+    --medium:#3b82f6;
+    --low:#94a3b8;
+    --panel:#1e293b;
+    --bg:#0f172a;
+    --border:#334155;
+}
+
+body{
+    margin:0;
+    font-family:'Inter',sans-serif;
+    background:var(--bg);
+    color:#f8fafc;
+    display:flex;
+}
+
+/* SIDEBAR */
+.sidebar{
+    width:260px;
+    background:var(--panel);
+    height:100vh;
+    padding:25px;
+}
+
+.sidebar h2{
+    color:#ef4444;
+    margin-bottom:40px;
+}
+
+.sidebar a{
+    display:block;
+    padding:12px 15px;
+    border-radius:8px;
+    color:#cbd5e1;
+    text-decoration:none;
+    margin-bottom:8px;
+}
+
+.sidebar a.active,
+.sidebar a:hover{
+    background:#334155;
+    color:white;
+}
+
+/* MAIN */
+.main{
+    flex-grow:1;
+    padding:40px;
+}
+
+/* HEADER */
+.header h1{
+    margin:0;
+    font-size:26px;
+}
+
+.header p{
+    color:#94a3b8;
+}
+
+/* FORM */
+.form-card{
+    background:var(--panel);
+    padding:25px;
+    border-radius:14px;
+    border:1px solid var(--border);
+    margin-bottom:40px;
+}
+
+.form-grid{
+    display:grid;
+    grid-template-columns:2fr 1fr 160px;
+    gap:20px;
+    align-items:end;
+}
+
+label{
+    font-size:12px;
+    color:#94a3b8;
+    font-weight:600;
+}
+
+input,select{
+    width:100%;
+    padding:12px;
+    background:#0f172a;
+    border:1px solid var(--border);
+    border-radius:8px;
+    color:white;
+}
+
+.btn{
+    background:var(--critical);
+    border:none;
+    padding:12px;
+    border-radius:8px;
+    font-weight:700;
+    cursor:pointer;
+    color:white;
+}
+
+.btn:hover{
+    background:#dc2626;
+}
+
+/* TABLE */
+.table-box{
+    background:var(--panel);
+    border-radius:14px;
+    border:1px solid var(--border);
+    overflow:hidden;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th{
+    background:#1e293b;
+    padding:16px;
+    font-size:12px;
+    text-transform:uppercase;
+    color:#94a3b8;
+    text-align:left;
+}
+
+td{
+    padding:16px;
+    border-bottom:1px solid var(--border);
+}
+
+/* STATUS BADGES */
+.badge{
+    padding:5px 12px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:700;
+}
+
+.badge-open{ background:#334155; color:#cbd5e1; }
+.badge-assigned{ background:#dcfce7; color:#15803d; }
+
+/* SEVERITY COLORS */
+.sev-4{ color:var(--critical); font-weight:700; }
+.sev-3{ color:var(--high); font-weight:700; }
+.sev-2{ color:var(--medium); font-weight:700; }
+.sev-1{ color:var(--low); font-weight:700; }
+
+/* ACTION */
+.btn-assign{
+    background:#2563eb;
+    color:white;
+    padding:6px 14px;
+    border-radius:20px;
+    font-size:12px;
+    text-decoration:none;
+    font-weight:600;
+}
+.btn-assign:hover{
+    background:#1d4ed8;
+}
+</style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <h2>🚨 MedFlow</h2>
+    <a href="/admin/dashboard">📊 Dashboard</a>
+    <a href="/admin/beds">🛏️ Bed Management</a>
+    <a href="/admin/doctors">👨‍⚕️ Doctors</a>
+    <a href="/emergency" class="active">🚑 Emergency</a>
+    <a href="/">🚪 Logout</a>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+    <div class="header">
+        <h1>Emergency Triage</h1>
+        <p>Register emergencies and assign beds in real time</p>
+    </div>
+
+    <!-- REGISTER FORM -->
+    <div class="form-card">
+        <h3>Register Emergency</h3>
+        <form class="form-grid" method="post" action="/emergency/register">
+            <div>
+                <label>Patient Name</label>
+                <input type="text" name="patientName" required>
+            </div>
+            <div>
+                <label>Severity</label>
+                <select name="severity">
+                    <option value="Critical">Critical</option>
+                    <option value="High">High</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Low">Low</option>
+                </select>
+            </div>
+            <button class="btn">Register</button>
+        </form>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-box">
+        <table>
+            <thead>
+                <tr>
+                    <th>Patient</th>
+                    <th>Severity</th>
+                    <th>Status</th>
+                    <th>Bed</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="e : ${emergencies}">
+                    <td th:text="${e.patientName}"></td>
+
+                    <td th:class="'sev-' + ${e.severity}"
+                        th:text="${e.severity}">
+                    </td>
+
+                    <td>
+                        <span class="badge"
+                              th:classappend="${e.status == 'OPEN' ? 'badge-open' : 'badge-assigned'}"
+                              th:text="${e.status}">
+                        </span>
+                    </td>
+
+                    <td th:text="${e.assignedBed != null ? e.assignedBed.bedType : 'Not Assigned'}"></td>
+
+                    <td>
+                        <a th:if="${e.assignedBed == null}"
+                           th:href="@{'/emergency/assignBed/' + ${e.emergencyId}}"
+                           class="btn-assign">
+                           Assign Bed
+                        </a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+</body>
+</html>

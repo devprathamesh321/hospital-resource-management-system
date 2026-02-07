@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Doctor Command Center</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Inter, Arial;
+    background: #f8fafc;
+    display: flex;
+}
+
+/* SIDEBAR */
+.sidebar {
+    width: 260px;
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    background: #0f172a;
+    z-index: 1000;
+}
+.viewport {
+    margin-left: 260px;   /* ✅ VERY IMPORTANT */
+    padding: 40px 50px;
+    min-height: 100vh;
+    background: #f8fafc;
+}
+header {
+    padding-left: 10px;
+}
+
+
+.sidebar h2 { color: #10b981; }
+.sidebar a {
+    display: block;
+    padding: 12px;
+    color: #cbd5f5;
+    text-decoration: none;
+    border-radius: 8px;
+    margin-bottom: 8px;
+}
+.sidebar a:hover, .sidebar a.active {
+    background: #1e293b;
+}
+
+/* MAIN */
+.main {
+    margin-left: 260px;
+    padding: 40px;
+    width: calc(100% - 260px);
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.card {
+    background: white;
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 10px 20px rgba(0,0,0,.05);
+}
+
+table {
+    width: 100%;
+    background: white;
+    border-radius: 16px;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 15px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.btn {
+    background: #10b981;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <h2>⚕️ MedFlow</h2>
+    <a href="/doctor/dashboard" class="active">📊 Dashboard</a>
+    <a href="/doctor/history">📁 History</a>
+    <a href="/doctor/settings">⚙️ Settings</a>
+    <a href="/login">🚪 Logout</a>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+<h1>Doctor Command Center</h1>
+<p>Logged in as <b th:text="${username}">Doctor</b></p>
+
+<div class="cards">
+    <div class="card">
+        <h3>Active Load</h3>
+        <h1 th:text="${activeCount}">0</h1>
+    </div>
+    <div class="card">
+        <h3>Red Alerts</h3>
+        <h1 th:text="${redAlerts}">0</h1>
+    </div>
+    <div class="card">
+        <h3>Completed</h3>
+        <h1 th:text="${completedCount}">0</h1>
+    </div>
+</div>
+
+<h2>Patient Worklist</h2>
+
+<table>
+<thead>
+<tr>
+    <th>Patient</th>
+    <th>Severity</th>
+    <th>Bed</th>
+    <th>Action</th>
+</tr>
+</thead>
+
+<tbody>
+<tr th:each="e : ${emergencies}">
+    <td th:text="${e.patientName}">Patient</td>
+    <td th:text="${e.severity}">3</td>
+    <td th:text="${e.assignedBed.bedType}">ICU</td>
+    <td>
+        <form th:action="@{'/doctor/finalize/' + ${e.emergencyId}}" method="post">
+            <button class="btn">Finalize</button>
+        </form>
+    </td>
+</tr>
+
+<tr th:if="${#lists.isEmpty(emergencies)}">
+    <td colspan="4">🎉 No active emergencies</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</body>
+</html>

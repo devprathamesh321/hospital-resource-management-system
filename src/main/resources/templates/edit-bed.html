@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Edit Bed | MedFlow</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+    :root {
+        --primary: #2563eb;
+        --primary-hover: #1d4ed8;
+        --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    }
+
+    body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        background: var(--bg-gradient);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0;
+    }
+
+    .card {
+        background: white;
+        padding: 40px;
+        border-radius: 24px;
+        width: 100%;
+        max-width: 450px;
+        box-shadow: var(--card-shadow);
+        border: 1px solid rgba(255, 255, 255, 0.8);
+    }
+
+    .header {
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+    .header h2 {
+        margin: 0;
+        color: #1e293b;
+        font-size: 24px;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+    }
+
+    .header p {
+        color: #64748b;
+        font-size: 14px;
+        margin-top: 8px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: block;
+        font-weight: 600;
+        font-size: 13px;
+        color: #475569;
+        margin-bottom: 8px;
+        margin-left: 4px;
+    }
+
+    input, select {
+        width: 100%;
+        padding: 12px 16px;
+        border-radius: 12px;
+        border: 2px solid #f1f5f9;
+        background: #f8fafc;
+        font-size: 15px;
+        color: #1e293b;
+        transition: all 0.2s ease;
+        box-sizing: border-box;
+    }
+
+    input:focus, select:focus {
+        outline: none;
+        border-color: var(--primary);
+        background: white;
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+    }
+
+    .btn-submit {
+        width: 100%;
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 16px;
+        border-radius: 14px;
+        font-weight: 600;
+        font-size: 16px;
+        cursor: pointer;
+        transition: transform 0.2s, background 0.2s;
+        margin-top: 10px;
+        box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+    }
+
+    .btn-submit:hover {
+        background: var(--primary-hover);
+        transform: translateY(-1px);
+    }
+
+    .btn-submit:active {
+        transform: translateY(0);
+    }
+
+    /* Subtle decorative element */
+    .bed-icon {
+        width: 50px;
+        height: 50px;
+        background: rgba(37, 99, 235, 0.1);
+        color: var(--primary);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 15px;
+        font-size: 24px;
+    }
+</style>
+</head>
+
+<body>
+
+<div class="card">
+    <div class="header">
+        <div class="bed-icon">🛏️</div>
+        <h2>Edit Bed Details</h2>
+        <p>Update hospital bed configuration and status</p>
+    </div>
+
+    <form th:action="@{/admin/updateBed}" method="post">
+        <input type="hidden" name="bedId" th:value="${bed.bedId}"/>
+
+        <div class="form-group">
+            <label>Bed Category</label>
+            <select name="bedType">
+                <option th:selected="${bed.bedType=='ICU'}">ICU</option>
+                <option th:selected="${bed.bedType=='GENERAL'}">GENERAL</option>
+                <option th:selected="${bed.bedType=='EMERGENCY'}">EMERGENCY</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Assigned Ward</label>
+            <input type="text" name="ward" th:value="${bed.ward}" placeholder="e.g. Ward A-12"/>
+        </div>
+
+        <div class="form-group">
+            <label>Current Status</label>
+            <select name="status">
+                <option th:selected="${bed.status=='AVAILABLE'}">🟢 AVAILABLE</option>
+                <option th:selected="${bed.status=='OCCUPIED'}">🔴 OCCUPIED</option>
+                <option th:selected="${bed.status=='MAINTENANCE'}">🟠 MAINTENANCE</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn-submit">Save Changes</button>
+    </form>
+</div>
+
+</body>
+</html>
